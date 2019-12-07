@@ -17,7 +17,7 @@ icon = Label(simple,image=personIcon,bg="#FFFFFF").place(x=0,y=400)
 
 l2 = Label(simple,text = "Enter Raw Text: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
 e1 = Entry(simple,font=("Ubuntu",15),textvariable=inputxt,bg="#FFFFFF",highlightbackground="#ba4a00")
-l3 = Label(simple,text = "Enter Website Forum: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00")
+l3 = Label(simple,text = "Enter a Reddit Forum: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00")
 e2 = Entry(simple, font=("Ubuntu",15),textvariable=forum,bg="#FFFFFF",highlightbackground="#ba4a00")
 l4 = Label(simple,text = "Enter Username: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00")
 e3 = Entry(simple, font=("Ubuntu",15),textvariable=user,bg="#FFFFFF",highlightbackground="#ba4a00")
