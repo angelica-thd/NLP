@@ -82,11 +82,11 @@
 \frametitle{How does the given framework work?}
 Deep Learning-Based Personality Detection\cite{traitpaper}
 \begin{itemize}
-	\item Preprocessing
-	\item Document-level feature extraction
-	\item Filtering
-	\item Word-level feature extraction
-	\item Classification
+	\item Preprocessing: sentence splitting, cleaning
+	\item Document-level feature extraction: Mairesse baseline feature set
+	\item Filtering: ignore sentences that don't carry any personality cues
+	\item Word-level feature extraction: word2vec representation 
+	\item Classification: deep CNN
 \end{itemize}
 \end{frame}
 
