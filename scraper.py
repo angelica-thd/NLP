@@ -5,11 +5,11 @@ import argparse
 import requests
 import re
 
-URL = 'https://old.reddit.com/'
-requestAgent = 'Mozilla/5.0 Chrome/47.0.2526.106 Safari/537.36'
+SITE_URL = 'https://old.reddit.com/'
+REQUEST_AGENT = 'Mozilla/5.0 Chrome/47.0.2526.106 Safari/537.36'
 
 def createSoup(url):
-    return BeautifulSoup(requests.get(url, headers={'User-Agent':requestAgent}).text, 'lxml')
+    return BeautifulSoup(requests.get(url, headers={'User-Agent':REQUEST_AGENT}).text, 'lxml')
 
 def getSearchResults(searchUrl):
     posts = []
@@ -39,7 +39,7 @@ def parseComments(commentsUrl):
         parentId = '       ' if parentId == commentId else parentId
        
        # print(commentId, 'reply-to:', parentId, 'num-replies:', numReplies, content[:63])
-        commentTree[commentId] = {'author':author, 'reply-to':parentId, 'text':content,
+      1  commentTree[commentId] = {'author':author, 'reply-to':parentId, 'text':content,
                                    'num-replies':numReplies}
     return commentTree
 
@@ -65,9 +65,9 @@ if __name__ == '__main__':
         print('ERROR: No search keyword specified.')
         exit()
     if args.subreddit == None:
-        searchUrl = URL + 'search?q="' + args.keyword + '"'
+        searchUrl = SITE_URL + 'search?q="' + args.keyword + '"'
     else:
-        searchUrl = URL + 'r/' + args.subreddit + '/search?q="' + args.keyword + '"&restrict_sr=on'
+        searchUrl = SITE_URL + 'r/' + args.subreddit + '/search?q="' + args.keyword + '"&restrict_sr=on'
    
     
     product = {}
