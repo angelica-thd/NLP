@@ -1,6 +1,7 @@
 from Tkinter import *
+from multiprocessing import Process, Manager
 import tkMessageBox
-
+import scraper
 
 
 simple=Tk()
@@ -8,7 +9,7 @@ simple.title("Personality Trait Identification")
 simple.geometry("1000x700")
 simple.configure(bg="#FFFFFF")
 keyword=StringVar()
-forum=StringVar()
+subreddit=StringVar()
 user=StringVar()
 
 l1 = Label(simple,bg="#FFFFFF",padx=20,text = "Enter the information required: ",font=("Ubuntu",20)).place(x=0,y=150)
@@ -17,15 +18,54 @@ icon = Label(simple,image=personIcon,bg="#FFFFFF").place(x=0,y=400)
 
 
 l2 = Label(simple,text = "Reddit Forum Subject: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
-e1 = Entry(simple,font=("Ubuntu",15),textvariable=forum,bg="#FFFFFF",highlightbackground="#ba4a00")
+e1 = Entry(simple,font=("Ubuntu",15),textvariable=subreddit,bg="#FFFFFF",highlightbackground="#ba4a00")
 l3 = Label(simple,text = "Keyword for Search: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00")
 e2 = Entry(simple, font=("Ubuntu",15),textvariable=keyword,bg="#FFFFFF",highlightbackground="#ba4a00")
 l4 = Label(simple,text = "Username: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00")
 e3 = Entry(simple, font=("Ubuntu",15),textvariable=user,bg="#FFFFFF",highlightbackground="#ba4a00")
 
-
 def button3():
- 	tkMessageBox.askokcancel("Are you sure?")
+	if len(keyword.get()) == 0:
+		tkMessageBox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
+	else:
+	 	if len(subreddit.get()) == 0:
+	 		searchUrl = scraper.URL + 'search?q="'+ keyword.get() + '"'
+	 	else:
+	 		searchUrl = scraper.URL + 'r/' + subreddit.get() +'/search?q="'+ keyword.get() +'&restrict_sr=on'
+
+	 	window = Toplevel(simple)
+	 	window.geometry("1000x700")
+		window.configure(bg="#FFFFFF")
+		URLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
+		postLabel = Label(window,font=("Ubuntu",15),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
+		resultsLabel = Label(window,font=("Ubuntu",11),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
+	 	product= {}
+	 	URLabel.configure(text = "Search URL: "+ searchUrl)
+	 	URLabel.place(x=0,y=50)
+	 	posts = scraper.getSearchResults(searchUrl)
+	 	postLabel.configure(text = "Scraping "+str(len(posts))+" posts.")
+	 	postLabel.place(x=0,y=100)
+	 	keyword.set(keyword.get().replace(' ','-'))
+	 	
+	 	product[keyword.get()] = {}
+	 	product[keyword.get()]['subreddit'] ='all' if len(subreddit.get()) == 0 else subreddit.get()
+	 	results = Manager().list()
+	 	opers = []
+	 	for post in posts:
+	 		oper = Process(target = scraper.parsePost, args=(post,results))
+	 		opers.append(oper)
+	 		oper.start()
+	 	for oper in opers:
+	 		oper.join()
+	 	product[keyword.get()]['posts'] = list(results)
+	 	postList = product[keyword.get()]['posts']
+	 	resultList = []  #trying to minimize the size of the comment list so mylaptop doesnt crash
+	 	for i in range(0,10):
+	 		resultList.append(postList[i])
+	 	resultsLabel.configure (text = "RESULTS:\n"+ resultList)
+	 	#resultsLabel.configure( text =  "RESULTS:\n" + product[keyword.get()]['posts'])
+
+
 
 b3 = Button(simple,text="Submit",font=("Ubuntu",20), command=button3,height=1,bg="#ba4a00",\
 	highlightbackground="#ba4a00",fg="#fff",activebackground="#fff",activeforeground="#ba4a00")
