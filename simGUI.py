@@ -25,13 +25,15 @@ l4 = Label(simple,text = "Username: ",font=("Ubuntu",20),bg="#FFFFFF",highlightb
 e3 = Entry(simple, font=("Ubuntu",15),textvariable=user,bg="#FFFFFF",highlightbackground="#ba4a00")
 
 def button3():
+
 	if len(keyword.get()) == 0:
 		tkMessageBox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
 	else:
+		keyword.set(keyword.get().replace(' ','-'))
 	 	if len(subreddit.get()) == 0:
-	 		searchUrl = scraper.URL + 'search?q="'+ keyword.get() + '"'
+	 		searchUrl = scraper.SITE_URL + 'search?q="'+ keyword.get() + '"'
 	 	else:
-	 		searchUrl = scraper.URL + 'r/' + subreddit.get() +'/search?q="'+ keyword.get() +'&restrict_sr=on'
+	 		searchUrl = scraper.SITE_URL + 'r/' + subreddit.get() +'/search?q="'+ keyword.get() +'&restrict_sr=on'
 
 	 	window = Toplevel(simple)
 	 	window.geometry("1000x700")
@@ -39,13 +41,13 @@ def button3():
 		URLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
 		postLabel = Label(window,font=("Ubuntu",15),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
 		resultsLabel = Label(window,font=("Ubuntu",11),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
+	 	
 	 	product= {}
 	 	URLabel.configure(text = "Search URL: "+ searchUrl)
 	 	URLabel.place(x=0,y=50)
 	 	posts = scraper.getSearchResults(searchUrl)
 	 	postLabel.configure(text = "Scraping "+str(len(posts))+" posts.")
 	 	postLabel.place(x=0,y=100)
-	 	keyword.set(keyword.get().replace(' ','-'))
 	 	
 	 	product[keyword.get()] = {}
 	 	product[keyword.get()]['subreddit'] ='all' if len(subreddit.get()) == 0 else subreddit.get()
@@ -59,10 +61,9 @@ def button3():
 	 		oper.join()
 	 	product[keyword.get()]['posts'] = list(results)
 	 	postList = product[keyword.get()]['posts']
-	 	resultList = []  #trying to minimize the size of the comment list so mylaptop doesnt crash
-	 	for i in range(0,10):
-	 		resultList.append(postList[i])
-	 	resultsLabel.configure (text = "RESULTS:\n"+ resultList)
+	 	for i in range(0,9):
+	 		resultsLabel.configure(text = str(postList[i])+ "\n")
+	 	resultsLabel.place(x=0, y=150)
 	 	#resultsLabel.configure( text =  "RESULTS:\n" + product[keyword.get()]['posts'])
 
 
