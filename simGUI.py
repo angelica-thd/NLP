@@ -8,6 +8,7 @@ simple=Tk()
 simple.title("Personality Trait Identification")
 simple.geometry("1000x700")
 simple.configure(bg="#FFFFFF")
+simple.resizable(True,True)
 keyword=StringVar()
 subreddit=StringVar()
 user=StringVar()
@@ -33,14 +34,17 @@ def button3():
 	 	if len(subreddit.get()) == 0:
 	 		searchUrl = scraper.SITE_URL + 'search?q="'+ keyword.get() + '"'
 	 	else:
+	 		subreddit.set(subreddit.get().replace(' ',''))
 	 		searchUrl = scraper.SITE_URL + 'r/' + subreddit.get() +'/search?q="'+ keyword.get() +'&restrict_sr=on'
 
+	 	scroll = Scrollbar(window, orient="vertical").place(x=990, y=0)
 	 	window = Toplevel(simple)
 	 	window.geometry("1000x700")
-		window.configure(bg="#FFFFFF")
+		window.configure(bg="#FFFFFF",yscrollcommand = scroll.set)
+		scroll.confuigure( command=window.yview)
 		URLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
 		postLabel = Label(window,font=("Ubuntu",15),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
-		resultsLabel = Label(window,font=("Ubuntu",11),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
+		
 	 	
 	 	product= {}
 	 	URLabel.configure(text = "Search URL: "+ searchUrl)
@@ -48,7 +52,8 @@ def button3():
 	 	posts = scraper.getSearchResults(searchUrl)
 	 	postLabel.configure(text = "Scraping "+str(len(posts))+" posts.")
 	 	postLabel.place(x=0,y=100)
-	 	
+	 	resultLabels = []
+
 	 	product[keyword.get()] = {}
 	 	product[keyword.get()]['subreddit'] ='all' if len(subreddit.get()) == 0 else subreddit.get()
 	 	results = Manager().list()
@@ -61,10 +66,9 @@ def button3():
 	 		oper.join()
 	 	product[keyword.get()]['posts'] = list(results)
 	 	postList = product[keyword.get()]['posts']
-	 	for i in range(0,9):
-	 		resultsLabel.configure(text = str(postList[i])+ "\n")
-	 	resultsLabel.place(x=0, y=150)
-	 	#resultsLabel.configure( text =  "RESULTS:\n" + product[keyword.get()]['posts'])
+	 	
+	 	for i in range(16):
+	 		resultLabels.append(Label(window,text = str(postList[i])+ "\n",font=("Ubuntu",11),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000").place(x =0,y= 150+50*i))
 
 
 
