@@ -65,13 +65,52 @@ def sentence_similarity(sentence1, sentence2):
             count += 1
  
     # Average the values
-    score /= count
+    if(count != 0):
+        score /= count
     return score
     
+
+def preprocess(text):
+    title_list = []
+    for t in text:
+        title_list.append(t['title'])
+        print(t['title'])
+    return title_list
+
+
+def compute_score(text, words):
+    score = 0
+    for t in text:
+        for w in words:
+            score += sentence_similarity(t, w)
+    return score
     
+
+
+
+def similarity(text):
+
+    score_list = []
+    score_list.append(compute_score(text, openness))
+    score_list.append(compute_score(text, conscientiousness))
+    score_list.append(compute_score(text, extraversion))
+    score_list.append(compute_score(text, agreeableness))
+    score_list.append(compute_score(text, neuroticism))
+    return(score_list)
+
+
+
+
+
+openness          = ['open', 'curious', 'inventive']
+conscientiousness = ['efficient', 'organized']
+extraversion      = ['outgoing', 'energetic']
+agreeableness     = ['friendly', 'compassionate']
+neuroticism       = ['sensitive', 'nervous']
+
+
     
-    
-sentences = [
+'''sentences = [
     "I like to study.",
     "I am very open and like to go out.",
     "I think I am very nice.",
@@ -90,5 +129,5 @@ for sentence in sentences:
     print("Similarity(\"%s\", \"%s\") = %s" % (extraversion, sentence, sentence_similarity(extraversion, sentence)))
     print("Similarity(\"%s\", \"%s\") = %s" % (agreeableness, sentence, sentence_similarity(agreeableness, sentence)))
     print("Similarity(\"%s\", \"%s\") = %s" % (neuroticism, sentence, sentence_similarity(neuroticism, sentence)))
-    print("\n")
+    print("\n")'''
 

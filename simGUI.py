@@ -1,7 +1,8 @@
-from Tkinter import *
+from tkinter import *
 from multiprocessing import Process, Manager
-import tkMessageBox
+#import tkMessageBox
 import scraper
+import wordnet_sim as ws
 
 
 simple=Tk()
@@ -14,8 +15,8 @@ subreddit=StringVar()
 user=StringVar()
 
 l1 = Label(simple,bg="#FFFFFF",padx=20,text = "Enter the information required: ",font=("Ubuntu",20)).place(x=0,y=150)
-personIcon = PhotoImage(file= "/home/angelica-theodorou/Documents/erasmus/NLP/personalitytraits.png")
-icon = Label(simple,image=personIcon,bg="#FFFFFF").place(x=0,y=400)
+#personIcon = PhotoImage(file= "/home/angelica-theodorou/Documents/erasmus/NLP/personalitytraits.png")
+#icon = Label(simple,image=personIcon,bg="#FFFFFF").place(x=0,y=400)
 
 
 l2 = Label(simple,text = "Reddit Forum Subject: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
@@ -28,47 +29,54 @@ e3 = Entry(simple, font=("Ubuntu",15),textvariable=user,bg="#FFFFFF",highlightba
 def button3():
 
 	if len(keyword.get()) == 0:
-		tkMessageBox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
+		#tkMessageBox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
+		tkinter.messagebox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
 	else:
 		keyword.set(keyword.get().replace(' ','-'))
-	 	if len(subreddit.get()) == 0:
-	 		searchUrl = scraper.SITE_URL + 'search?q="'+ keyword.get() + '"'
-	 	else:
-	 		subreddit.set(subreddit.get().replace(' ',''))
-	 		searchUrl = scraper.SITE_URL + 'r/' + subreddit.get() +'/search?q="'+ keyword.get() +'&restrict_sr=on'
+		if len(subreddit.get()) == 0:
+			searchUrl = scraper.SITE_URL + 'search?q="'+ keyword.get() + '"'
+		else:
+			subreddit.set(subreddit.get().replace(' ',''))
+			searchUrl = scraper.SITE_URL + 'r/' + subreddit.get() +'/search?q="'+ keyword.get() +'&restrict_sr=on'
 
-	 	scroll = Scrollbar(window, orient="vertical").place(x=990, y=0)
-	 	window = Toplevel(simple)
-	 	window.geometry("1000x700")
-		window.configure(bg="#FFFFFF",yscrollcommand = scroll.set)
-		scroll.confuigure( command=window.yview)
+		window = Toplevel(simple)
+		window.geometry("1000x700")
+		#scroll = Scrollbar(window, orient="vertical").place(x=990, y=0)
+		
+		
+		#scroll.config( command=window.yview)
+		window.configure(bg="#FFFFFF")#,yscrollcommand = scroll.set)
+		
 		URLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
 		postLabel = Label(window,font=("Ubuntu",15),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
 		
 	 	
-	 	product= {}
-	 	URLabel.configure(text = "Search URL: "+ searchUrl)
-	 	URLabel.place(x=0,y=50)
-	 	posts = scraper.getSearchResults(searchUrl)
-	 	postLabel.configure(text = "Scraping "+str(len(posts))+" posts.")
-	 	postLabel.place(x=0,y=100)
-	 	resultLabels = []
+		product= {}
+		URLabel.configure(text = "Search URL: "+ searchUrl)
+		URLabel.place(x=0,y=50)
+		posts = scraper.getSearchResults(searchUrl)
+		postLabel.configure(text = "Scraping "+str(len(posts))+" posts.")
+		postLabel.place(x=0,y=100)
+		resultLabels = []
 
-	 	product[keyword.get()] = {}
-	 	product[keyword.get()]['subreddit'] ='all' if len(subreddit.get()) == 0 else subreddit.get()
-	 	results = Manager().list()
-	 	opers = []
-	 	for post in posts:
-	 		oper = Process(target = scraper.parsePost, args=(post,results))
-	 		opers.append(oper)
-	 		oper.start()
-	 	for oper in opers:
-	 		oper.join()
-	 	product[keyword.get()]['posts'] = list(results)
-	 	postList = product[keyword.get()]['posts']
+		product[keyword.get()] = {}
+		product[keyword.get()]['subreddit'] ='all' if len(subreddit.get()) == 0 else subreddit.get()
+		results = Manager().list()
+		opers = []
+		for post in posts:
+			oper = Process(target = scraper.parsePost, args=(post,results))
+			opers.append(oper)
+			oper.start()
+		for oper in opers:
+			oper.join()
+		product[keyword.get()]['posts'] = list(results)
+		postList = product[keyword.get()]['posts']
+		temp = ws.preprocess(results)
+		score_list = ws.similarity(temp)
+		print(score_list)
 	 	
-	 	for i in range(16):
-	 		resultLabels.append(Label(window,text = str(postList[i])+ "\n",font=("Ubuntu",11),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000").place(x =0,y= 150+50*i))
+		for i in range(16):
+			resultLabels.append(Label(window,text = str(postList[i])+ "\n",font=("Ubuntu",11),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000").place(x =0,y= 150+50*i))
 
 
 

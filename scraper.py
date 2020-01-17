@@ -38,8 +38,8 @@ def parseComments(commentsUrl):
         parentId = parent['href'][1:] if parent != None else '       '
         parentId = '       ' if parentId == commentId else parentId
        
-       # print(commentId, 'reply-to:', parentId, 'num-replies:', numReplies, content[:63])
-      1  commentTree[commentId] = {'author':author, 'reply-to':parentId, 'text':content,
+        # print(commentId, 'reply-to:', parentId, 'num-replies:', numReplies, content[:63])
+        commentTree[commentId] = {'author':author, 'reply-to':parentId, 'text':content,
                                    'num-replies':numReplies}
     return commentTree
 
