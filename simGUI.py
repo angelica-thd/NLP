@@ -1,9 +1,7 @@
-from tkinter import *
+from Tkinter import *
 from multiprocessing import Process, Manager
-#import tkMessageBox
+import tkMessageBox
 import scraper
-import wordnet_sim as ws
-
 
 simple=Tk()
 simple.title("Personality Trait Identification")
@@ -13,10 +11,12 @@ simple.resizable(True,True)
 keyword=StringVar()
 subreddit=StringVar()
 user=StringVar()
+searchUrl =StringVar()
+SITE_URL = 'https://old.reddit.com/'
 
 l1 = Label(simple,bg="#FFFFFF",padx=20,text = "Enter the information required: ",font=("Ubuntu",20)).place(x=0,y=150)
-#personIcon = PhotoImage(file= "/home/angelica-theodorou/Documents/erasmus/NLP/personalitytraits.png")
-#icon = Label(simple,image=personIcon,bg="#FFFFFF").place(x=0,y=400)
+personIcon = PhotoImage(file= "/home/angelica-theodorou/Documents/erasmus/NLP/personalityTraits.png")
+icon = Label(simple,image=personIcon,bg="#FFFFFF").place(x=0,y=400)
 
 
 l2 = Label(simple,text = "Reddit Forum Subject: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
@@ -26,67 +26,75 @@ e2 = Entry(simple, font=("Ubuntu",15),textvariable=keyword,bg="#FFFFFF",highligh
 l4 = Label(simple,text = "Username: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00")
 e3 = Entry(simple, font=("Ubuntu",15),textvariable=user,bg="#FFFFFF",highlightbackground="#ba4a00")
 
-def button3():
-
-	if len(keyword.get()) == 0:
-		#tkMessageBox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
-		tkinter.messagebox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
-	else:
+#kane sunt8iki na pairnei gia url mono to subreddit sto sectin tou username
+def onclick():
+	if scraper.userBtn == False and len(keyword.get()) == 0:
+		tkMessageBox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
+	elif scraper.userBtn == False and len(keyword.get()) !=0:
 		keyword.set(keyword.get().replace(' ','-'))
+		key = keyword.get()
 		if len(subreddit.get()) == 0:
-			searchUrl = scraper.SITE_URL + 'search?q="'+ keyword.get() + '"'
-		else:
-			subreddit.set(subreddit.get().replace(' ',''))
-			searchUrl = scraper.SITE_URL + 'r/' + subreddit.get() +'/search?q="'+ keyword.get() +'&restrict_sr=on'
+	 		searchUrl = SITE_URL + 'search?q="'+ keyword.get() + '"'
+	 		sub = None
+	 	else:
+	 		subreddit.set(subreddit.get().replace(' ',''))
+	 		sub = subreddit.get()
+	 		searchUrl = SITE_URL + 'r/' + sub +'/search?q="'+ key +'&restrict_sr=on'	 	
+	elif scraper.userBtn == True and len(subreddit.get()) == 0:
+		tkMessageBox.showerror("WARNING","No reddit Forum detected:\nPlease enter a reddit forum(subject) if you want to get results.")
+	elif scraper.userBtn == True and len(subreddit.get()) != 0:
+		subreddit.set(subreddit.get().replace(' ','-'))
+		sub = None
+		key = sub
+		searchUrl = SITE_URL + 'search?q="' + key +'"'
 
-		window = Toplevel(simple)
-		window.geometry("1000x700")
-		#scroll = Scrollbar(window, orient="vertical").place(x=990, y=0)
-		
-		
-		#scroll.config( command=window.yview)
-		window.configure(bg="#FFFFFF")#,yscrollcommand = scroll.set)
-		
-		URLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
-		postLabel = Label(window,font=("Ubuntu",15),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
-		
-	 	
-		product= {}
-		URLabel.configure(text = "Search URL: "+ searchUrl)
-		URLabel.place(x=0,y=50)
-		posts = scraper.getSearchResults(searchUrl)
-		postLabel.configure(text = "Scraping "+str(len(posts))+" posts.")
-		postLabel.place(x=0,y=100)
-		resultLabels = []
+	postlist = scraper.returnResults(searchUrl,key,sub)
 
-		product[keyword.get()] = {}
-		product[keyword.get()]['subreddit'] ='all' if len(subreddit.get()) == 0 else subreddit.get()
-		results = Manager().list()
-		opers = []
-		for post in posts:
-			oper = Process(target = scraper.parsePost, args=(post,results))
-			opers.append(oper)
-			oper.start()
-		for oper in opers:
-			oper.join()
-		product[keyword.get()]['posts'] = list(results)
-		postList = product[keyword.get()]['posts']
-		temp = ws.preprocess(results)
+	temp = ws.preprocess(results)
 		score_list = ws.similarity(temp)
 		print(score_list)
-	 	
-		for i in range(16):
-			resultLabels.append(Label(window,text = str(postList[i])+ "\n",font=("Ubuntu",11),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000").place(x =0,y= 150+50*i))
+
+	return searchUrl
+
+
+def createWindow(searchUrl):
+	window = Toplevel(simple)
+	window.geometry("1000x700")
+	window.configure(bg="#FFFFFF")
+	URLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
+	URLabel.configure(text = "Search URL: "+ searchUrl)
+	URLabel.place(x=0,y=50)
+	postLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
+	postLabel.configure(text = "Scraping..." +len(scraper.posts) +"posts.")
+	posLabel.place(x=0,y=60)
 
 
 
-b3 = Button(simple,text="Submit",font=("Ubuntu",20), command=button3,height=1,bg="#ba4a00",\
+def submitKey():
+	searchUrl = onclick()
+	createWindow(searchUrl)
+	
+		
+def submitUser():
+	scraper.userBtn = True
+	scraper.user = user.get()
+	searchUrl = onclick()
+	createWindow(searchUrl)
+	scraper.userBtn = False
+		
+
+
+b3 = Button(simple,text="Submit",font=("Ubuntu",20), command=submitKey,height=1,bg="#ba4a00",\
 	highlightbackground="#ba4a00",fg="#fff",activebackground="#fff",activeforeground="#ba4a00")
+b4 = Button(simple,text="Submit",font=("Ubuntu",20), command=submitUser,height=1,bg="#ba4a00",\
+	highlightbackground="#ba4a00",fg="#fff",activebackground="#fff",activeforeground="#ba4a00")
+
 
 def button1():
 	b3.place_forget()
 	l4.place_forget()
 	e3.place_forget()
+	b4.place_forget()
 	l2.place(x=500,y=50)
 	e1.place(x=500,y=100)
 	l3.place(x=500,y=150)
@@ -104,7 +112,7 @@ def button2():
 	e1.place(x=500,y=450)
 	l4.place(x=500,y=500)
 	e3.place(x=500,y=550)
-	b3.place(x=500,y=600)
+	b4.place(x=500,y=600)
 	
 
 b1 = Button(simple,text="Reddit Forum and Keyword",font=("Ubuntu",20),command=button1,width= 30, height=1,bg="#ba4a00",\
