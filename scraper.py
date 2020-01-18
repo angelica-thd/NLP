@@ -3,10 +3,12 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 import argparse
 import requests
+import json
 import re
 
 SITE_URL = 'https://old.reddit.com/'
 REQUEST_AGENT = 'Mozilla/5.0 Chrome/47.0.2526.106 Safari/537.36'
+userBtn = False
 
 def createSoup(url):
     return BeautifulSoup(requests.get(url, headers={'User-Agent':REQUEST_AGENT}).text, 'lxml')
@@ -37,10 +39,11 @@ def parseComments(commentsUrl):
         parent = comment.find('a', {'data-event-action':'parent'})
         parentId = parent['href'][1:] if parent != None else '       '
         parentId = '       ' if parentId == commentId else parentId
-       
-        # print(commentId, 'reply-to:', parentId, 'num-replies:', numReplies, content[:63])
-        commentTree[commentId] = {'author':author, 'reply-to':parentId, 'text':content,
-                                   'num-replies':numReplies}
+        #print(commentId, 'reply-to:', parentId, 'num-replies:', numReplies, content[:63])
+        if userBtn:
+            commentTree[commentId] = {'author':user, 'reply-to':parentId, 'text':content, 'num-replies':numReplies}
+        else:
+            commentTree[commentId] = {'author':author, 'reply-to':parentId, 'text':content, 'num-replies':numReplies}
     return commentTree
 
 def parsePost(post, results):
@@ -50,11 +53,11 @@ def parsePost(post, results):
     commentsTag = post.find('a', {'class':'search-comments'})
     url = commentsTag['href']
     numComments = int(re.match(r'\d+', commentsTag.text).group(0))
-   # print("\n" + ":", numComments, author, subreddit, title)
+    print("\n" + ":", numComments, author, subreddit, title)
     commentTree = {} if numComments == 0 else parseComments(url)
-    results.append({'title':title, 'url':url,
-                    'author':author, 'subreddit':subreddit, 'comments':commentTree})
+    results.append({'title':title, 'author':author, 'subreddit':subreddit, 'comments':commentTree})
 
+'''
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--keyword', type=str, help='keyword to search')
@@ -68,15 +71,17 @@ if __name__ == '__main__':
         searchUrl = SITE_URL + 'search?q="' + args.keyword + '"'
     else:
         searchUrl = SITE_URL + 'r/' + args.subreddit + '/search?q="' + args.keyword + '"&restrict_sr=on'
-   
+   '''
+def returnResults(searchUrl,keyword,subreddit):
     
     product = {}
-    print('Search URL:', searchUrl)
+  #  print('Search URL:', searchUrl)
     posts = getSearchResults(searchUrl)
-    print('Started scraping', len(posts), 'posts.')
-    keyword = args.keyword.replace(' ', '-')
+   # print('Started scraping', len(posts), 'posts.')
+#    keyword = args.keyword.replace(' ', '-')
     product[keyword] = {}
-    product[keyword]['subreddit'] = 'all' if args.subreddit == None else args.subreddit
+ #   product[keyword]['subreddit'] = 'all' if args.subreddit == None else args.subreddit
+    product[keyword]['subreddit'] = 'all' if subreddit == None else subreddit
     results = Manager().list()
     jobs = []
     for post in posts:
@@ -86,4 +91,5 @@ if __name__ == '__main__':
     for job in jobs:
         job.join()
     product[keyword]['posts'] = list(results)
-    
+    postList = product[keyword]['posts']
+    return postList    
