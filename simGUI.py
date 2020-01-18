@@ -29,6 +29,8 @@ e3 = Entry(simple, font=("Ubuntu",15),textvariable=user,bg="#FFFFFF",highlightba
 #kane sunt8iki na pairnei gia url mono to subreddit sto sectin tou username
 def onclick():
 	if scraper.userBtn == False and len(keyword.get()) == 0:
+		#for python3
+		#tkmessagebox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
 		tkMessageBox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
 	elif scraper.userBtn == False and len(keyword.get()) !=0:
 		keyword.set(keyword.get().replace(' ','-'))
