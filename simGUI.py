@@ -13,6 +13,7 @@ subreddit=StringVar()
 user=StringVar()
 searchUrl =StringVar()
 SITE_URL = 'https://old.reddit.com/'
+postNum = 0
 
 l1 = Label(simple,bg="#FFFFFF",padx=20,text = "Enter the information required: ",font=("Ubuntu",20)).place(x=0,y=150)
 personIcon = PhotoImage(file= "/home/angelica-theodorou/Documents/erasmus/NLP/personalityTraits.png")
@@ -26,13 +27,32 @@ e2 = Entry(simple, font=("Ubuntu",15),textvariable=keyword,bg="#FFFFFF",highligh
 l4 = Label(simple,text = "Username: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00")
 e3 = Entry(simple, font=("Ubuntu",15),textvariable=user,bg="#FFFFFF",highlightbackground="#ba4a00")
 
-#kane sunt8iki na pairnei gia url mono to subreddit sto sectin tou username
-def onclick():
-	if scraper.userBtn == False and len(keyword.get()) == 0:
+def createWindow(searchUrl):
+	window = Toplevel(simple)
+	window.geometry("1000x700")
+	window.configure(bg="#FFFFFF")
+	URLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
+	URLabel.configure(text = "Search URL: "+ searchUrl)
+	URLabel.place(x=0,y=50)
+	scoreLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
+	scoreLabel.configure(text = "Similarity score: ")
+	scoreLabel.place(x =0, y =150)
+	#postLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
+	#postLabel.configure(text = "Scraping...%s posts." % postNum)
+	#postLabel.place(x=0,y=100)
+	''' will put this on the scoreLabel later
+	temp = ws.preprocess(results)
+	score_list = ws.similarity(temp)
+	print(score_list)'''
+
+def submitKey():
+	username = None
+	if len(keyword.get()) == 0:
 		#for python3
 		#tkmessagebox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
+		
 		tkMessageBox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
-	elif scraper.userBtn == False and len(keyword.get()) !=0:
+	else:
 		keyword.set(keyword.get().replace(' ','-'))
 		key = keyword.get()
 		if len(subreddit.get()) == 0:
@@ -41,48 +61,26 @@ def onclick():
 	 	else:
 	 		subreddit.set(subreddit.get().replace(' ',''))
 	 		sub = subreddit.get()
-	 		searchUrl = SITE_URL + 'r/' + sub +'/search?q="'+ key +'&restrict_sr=on'	 	
-	elif scraper.userBtn == True and len(subreddit.get()) == 0:
-		tkMessageBox.showerror("WARNING","No reddit Forum detected:\nPlease enter a reddit forum(subject) if you want to get results.")
-	elif scraper.userBtn == True and len(subreddit.get()) != 0:
-		subreddit.set(subreddit.get().replace(' ','-'))
-		sub = None
-		key = sub
-		searchUrl = SITE_URL + 'search?q="' + key +'"'
-
-	postlist = scraper.returnResults(searchUrl,key,sub)
-
-	temp = ws.preprocess(results)
-		score_list = ws.similarity(temp)
-		print(score_list)
-
-	return searchUrl
-
-
-def createWindow(searchUrl):
-	window = Toplevel(simple)
-	window.geometry("1000x700")
-	window.configure(bg="#FFFFFF")
-	URLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
-	URLabel.configure(text = "Search URL: "+ searchUrl)
-	URLabel.place(x=0,y=50)
-	postLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
-	postLabel.configure(text = "Scraping..." +len(scraper.posts) +"posts.")
-	posLabel.place(x=0,y=60)
-
-
-
-def submitKey():
-	searchUrl = onclick()
+	 		searchUrl = SITE_URL + 'r/' + sub +'/search?q="'+ key +'&restrict_sr=on'	
+	postlist = scraper.returnResults(searchUrl,key,sub,username)
+	#postNum = str(len(postlist)) 
 	createWindow(searchUrl)
 	
 		
 def submitUser():
-	scraper.userBtn = True
-	scraper.user = user.get()
-	searchUrl = onclick()
+	if len(subreddit.get()) == 0:
+		
+		tkMessageBox.showerror("WARNING","No reddit Forum detected:\nPlease enter a reddit forum(subject) if you want to get results.")
+	else:
+		subreddit.set(subreddit.get().replace(' ','-'))
+		sub = None
+		key = subreddit.get()
+		searchUrl = SITE_URL + 'search?q="' + key +'"'
+	username = user.get()
+	postlist = scraper.returnResults(searchUrl,key,sub,username)
+	postNum = str(len(postlist))
 	createWindow(searchUrl)
-	scraper.userBtn = False
+
 		
 
 
