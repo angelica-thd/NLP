@@ -1,7 +1,8 @@
-from Tkinter import *
+from tkinter import *
 from multiprocessing import Process, Manager
-import tkMessageBox
+#import tkMessageBox
 import scraper
+import wordnet_sim as ws
 
 simple=Tk()
 simple.title("Personality Trait Identification")
@@ -16,8 +17,8 @@ SITE_URL = 'https://old.reddit.com/'
 postNum = 0
 
 l1 = Label(simple,bg="#FFFFFF",padx=20,text = "Enter the information required: ",font=("Ubuntu",20)).place(x=0,y=150)
-personIcon = PhotoImage(file= "/home/angelica-theodorou/Documents/erasmus/NLP/personalityTraits.png")
-icon = Label(simple,image=personIcon,bg="#FFFFFF").place(x=0,y=400)
+#personIcon = PhotoImage(file= "/home/angelica-theodorou/Documents/erasmus/NLP/personalityTraits.png")
+#icon = Label(simple,image=personIcon,bg="#FFFFFF").place(x=0,y=400)
 
 
 l2 = Label(simple,text = "Reddit Forum Subject: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
@@ -27,7 +28,7 @@ e2 = Entry(simple, font=("Ubuntu",15),textvariable=keyword,bg="#FFFFFF",highligh
 l4 = Label(simple,text = "Username: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00")
 e3 = Entry(simple, font=("Ubuntu",15),textvariable=user,bg="#FFFFFF",highlightbackground="#ba4a00")
 
-def createWindow(searchUrl):
+def createWindow(searchUrl, score_list):
 	window = Toplevel(simple)
 	window.geometry("1000x700")
 	window.configure(bg="#FFFFFF")
@@ -35,36 +36,37 @@ def createWindow(searchUrl):
 	URLabel.configure(text = "Search URL: "+ searchUrl)
 	URLabel.place(x=0,y=50)
 	scoreLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
-	scoreLabel.configure(text = "Similarity score: ")
+	scoreLabel.configure(text = "Similarity score: \n          Openness: " + str(score_list[0]) + "% \n                   Conscientiousness: "+ str(score_list[1]) + "% \n              Extraversion: "+ str(score_list[2]) + "% \n               Agreeableness: "+ str(score_list[3]) + "% \n            Neuroticism: "+ str(score_list[4]) +"%" )
 	scoreLabel.place(x =0, y =150)
 	#postLabel = Label(window,font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00",fg="#000000")
 	#postLabel.configure(text = "Scraping...%s posts." % postNum)
 	#postLabel.place(x=0,y=100)
-	''' will put this on the scoreLabel later
-	temp = ws.preprocess(results)
-	score_list = ws.similarity(temp)
-	print(score_list)'''
+	''' will put this on the scoreLabel later'''
+	
 
 def submitKey():
 	username = None
 	if len(keyword.get()) == 0:
 		#for python3
-		#tkmessagebox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
+		tkmessagebox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
 		
-		tkMessageBox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
+		#tkMessageBox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
 	else:
 		keyword.set(keyword.get().replace(' ','-'))
 		key = keyword.get()
 		if len(subreddit.get()) == 0:
 	 		searchUrl = SITE_URL + 'search?q="'+ keyword.get() + '"'
 	 		sub = None
-	 	else:
-	 		subreddit.set(subreddit.get().replace(' ',''))
-	 		sub = subreddit.get()
-	 		searchUrl = SITE_URL + 'r/' + sub +'/search?q="'+ key +'&restrict_sr=on'	
+		else:
+			subreddit.set(subreddit.get().replace(' ',''))
+			sub = subreddit.get()
+			searchUrl = SITE_URL + 'r/' + sub +'/search?q="'+ key +'&restrict_sr=on'	
 	postlist = scraper.returnResults(searchUrl,key,sub,username)
+	temp = ws.preprocess(postlist)
+	score_list = ws.similarity(temp)
+	print(score_list)
 	#postNum = str(len(postlist)) 
-	createWindow(searchUrl)
+	createWindow(searchUrl, score_list)
 	
 		
 def submitUser():
@@ -79,7 +81,10 @@ def submitUser():
 	username = user.get()
 	postlist = scraper.returnResults(searchUrl,key,sub,username)
 	postNum = str(len(postlist))
-	createWindow(searchUrl)
+	temp = ws.preprocess(postlist)
+	score_list = ws.similarity(temp)
+	print(score_list)
+	createWindow(searchUrl, score_list)
 
 		
 

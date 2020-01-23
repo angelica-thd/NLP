@@ -2,6 +2,7 @@
 
 from nltk.corpus import wordnet as wn
 from nltk import word_tokenize, pos_tag
+from decimal import Decimal
 
 
 def penn_to_wn(tag):
@@ -74,7 +75,7 @@ def preprocess(text):
     title_list = []
     for t in text:
         title_list.append(t['title'])
-        print(t['title'])
+        #print(t['title'])
     return title_list
 
 
@@ -89,24 +90,63 @@ def compute_score(text, words):
 
 
 def similarity(text):
+    print(len(text))
+
+    # compute individual scores
+    yo = compute_score(text, openness)/len(text)
+    no = compute_score(text, n_openness)/len(text)
+
+    yc = compute_score(text, conscientiousness)/len(text)
+    nc = compute_score(text, n_conscientiousness)/len(text)
+
+    ye = compute_score(text, extraversion)/len(text)
+    ne = compute_score(text, n_extraversion)/len(text)
+
+    ya = compute_score(text, agreeableness)/len(text)
+    na = compute_score(text, n_agreeableness)/len(text)
+
+    yn = compute_score(text, neuroticism)/len(text)
+    nn = compute_score(text, n_neuroticism)/len(text)
+
+    print("o: " + str(yo) + " " + str(no))
+    print("c: " + str(yc) + " " + str(nc))
+    print("e: " + str(ye) + " " + str(ne))
+    print("a: " + str(ya) + " " + str(na))
+    print("n: " + str(yn) + " " + str(nn))
+
+    o = (yo-no)/2 + 0.5
+    c = (yc-nc)/2 + 0.5
+    e = (ye-ne)/2 + 0.5
+    a = (ya-na)/2 + 0.5
+    n = (yn-nn)/2 + 0.5
+    
 
     score_list = []
-    score_list.append(compute_score(text, openness))
-    score_list.append(compute_score(text, conscientiousness))
-    score_list.append(compute_score(text, extraversion))
-    score_list.append(compute_score(text, agreeableness))
-    score_list.append(compute_score(text, neuroticism))
+    score_list.append(round(Decimal(o*100),2))
+    score_list.append(round(Decimal(c*100),2))
+    score_list.append(round(Decimal(e*100),2))
+    score_list.append(round(Decimal(a*100),2))
+    score_list.append(round(Decimal(n*100),2))
     return(score_list)
 
 
 
 
 
-openness          = ['open', 'curious', 'inventive']
-conscientiousness = ['efficient', 'organized']
-extraversion      = ['outgoing', 'energetic']
-agreeableness     = ['friendly', 'compassionate']
-neuroticism       = ['sensitive', 'nervous']
+openness   = ['open', 'curious', 'inventive', 'acceptance', 'tolerance', 'interest', 'new', 'unconventional', 'risky']
+n_openness = ['restricted', 'incurious', 'disinterested', 'disbelief', 'intolerance', 'conventional', 'safe']
+
+conscientiousness   = ['efficient', 'organized', 'dutiful', 'upright', 'exact', 'reliable', 'discipline', 'methodical']
+n_conscientiousness = ['inefficient', 'unorganized', 'undutiful', 'loose', 'imprecise', 'fuzzy', 'chaotic']
+
+extraversion      = ['extrovert', 'outgoing', 'energetic', 'communicable', 'unreserved', 'social']
+n_extraversion    = ['introvert', 'shy', 'restrained', 'collected', 'cautious', 'uncommunicative']
+
+agreeableness     = ['friendly', 'compassionate', 'pleasant']
+n_agreeableness   = ['unfriendly', 'harsh', 'unpleasant', 'hard']
+
+neuroticism       = ['sensitive', 'nervous', 'obsessive', 'hysteric', 'anxious', 'nervous', 'unstable']
+n_neuroticism     = ['adjusted', 'balanced', 'stable']
 
 
     
