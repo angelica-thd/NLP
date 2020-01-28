@@ -39,21 +39,10 @@ def parseComments(commentsUrl,user):
         parent = comment.find('a', {'data-event-action':'parent'})
         parentId = parent['href'][1:] if parent != None else '       '
         parentId = '       ' if parentId == commentId else parentId
+        print(commentId, 'reply-to:', parentId, 'num-replies:', numReplies, content[:63])
         commentTree[commentId] = {'author':author, 'reply-to':parentId, 'text':content, 'num-replies':numReplies}
         return commentTree
-        #print(commentId, 'reply-to:', parentId, 'num-replies:', numReplies, content[:63])
-'''  commented cause it doesnt work as expected, will fix later
-            if len(user)!=0:
-            commentTree1 = {}
-            commentTree1[commentId] =  {'author':author, 'reply-to':parentId, 'text':content, 'num-replies':numReplies}
-            if user in commentTree1.items():
-                author = user
-                commentTree[commentId] = {'author':author, 'reply-to':parentId, 'text':content, 'num-replies':numReplies}
-            else:
-               break
-               print("No post from user:"+user+" in this reddit forum...")
-        else:
-            commentTree[commentId] = {'author':author, 'reply-to':parentId, 'text':content, 'num-replies':numReplies}'''
+        
     
 
 def parsePost(post, results, user):
@@ -63,15 +52,18 @@ def parsePost(post, results, user):
     commentsTag = post.find('a', {'class':'search-comments'})
     url = commentsTag['href']
     numComments = int(re.match(r'\d+', commentsTag.text).group(0))
-    print("\n" + ":", numComments, author, subreddit, title)
-    commentTree = {} if numComments == 0 else parseComments(url,user)
     results.append({'title':title, 'author':author, 'subreddit':subreddit, 'comments':commentTree})
+    if len(user)!=0:
+        print('\n',':',numComments,user,subreddit,title)
+    else:
+        print('\n' + ':', numComments, author, subreddit, title)
+        commentTree = {} if numComments == 0 else parseComments(url,user)
+        results.append({'title':title, 'author':author, 'subreddit':subreddit, 'comments':commentTree})
 
 
 def returnResults(searchUrl,keyword,subreddit,user):
     sys.setrecursionlimit(10000)
     product = {}
-  #  print('Search URL:', searchUrl)
     posts = getSearchResults(searchUrl)
     product[keyword] = {}
     product[keyword]['subreddit'] = 'all' if subreddit == None else subreddit
@@ -85,5 +77,4 @@ def returnResults(searchUrl,keyword,subreddit,user):
         job.join()
     product[keyword]['posts'] = list(results)
     postList = product[keyword]['posts']
-    #print(str(len(posts))+"posts")
     return postList    
