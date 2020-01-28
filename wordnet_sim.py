@@ -37,6 +37,7 @@ def tagged_to_synset(word, tag):
         
 def sentence_similarity(sentence1, sentence2):
     """ compute the sentence similarity using Wordnet """
+    
     # Tokenize and tag
     sentence1 = pos_tag(word_tokenize(sentence1))
     sentence2 = pos_tag(word_tokenize(sentence2))
@@ -84,6 +85,7 @@ def compute_score(text, words):
     for t in text:
         for w in words:
             score += sentence_similarity(t, w)
+    score /= len(text)
     return score
     
 
@@ -93,20 +95,20 @@ def similarity(text):
     print(len(text))
 
     # compute individual scores
-    yo = compute_score(text, openness)/len(text)
-    no = compute_score(text, n_openness)/len(text)
+    yo = compute_score(text, openness)
+    no = compute_score(text, n_openness)
+    
+    yc = compute_score(text, conscientiousness)
+    nc = compute_score(text, n_conscientiousness)
 
-    yc = compute_score(text, conscientiousness)/len(text)
-    nc = compute_score(text, n_conscientiousness)/len(text)
+    ye = compute_score(text, extraversion)
+    ne = compute_score(text, n_extraversion)
 
-    ye = compute_score(text, extraversion)/len(text)
-    ne = compute_score(text, n_extraversion)/len(text)
+    ya = compute_score(text, agreeableness)
+    na = compute_score(text, n_agreeableness)
 
-    ya = compute_score(text, agreeableness)/len(text)
-    na = compute_score(text, n_agreeableness)/len(text)
-
-    yn = compute_score(text, neuroticism)/len(text)
-    nn = compute_score(text, n_neuroticism)/len(text)
+    yn = compute_score(text, neuroticism)
+    nn = compute_score(text, n_neuroticism)
 
     print("o: " + str(yo) + " " + str(no))
     print("c: " + str(yc) + " " + str(nc))
