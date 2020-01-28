@@ -53,7 +53,7 @@ def parsePost(post, results, user):
     url = commentsTag['href']
     numComments = int(re.match(r'\d+', commentsTag.text).group(0))
     results.append({'title':title, 'author':author, 'subreddit':subreddit, 'comments':commentTree})
-    if len(user)!=0:
+    if user!=None:
         print('\n',':',numComments,user,subreddit,title)
     else:
         print('\n' + ':', numComments, author, subreddit, title)
