@@ -24,7 +24,7 @@ def getSearchResults(searchUrl):
         else:
             return posts
 
-def parseComments(commentsUrl,user):
+def parseComments(commentsUrl):
     commentTree = {}
     commentsPage = createSoup(commentsUrl)
     commentsDiv = commentsPage.find('div', {'class':'sitetable nestedlisting'})
@@ -54,9 +54,10 @@ def parsePost(post, results, user):
     numComments = int(re.match(r'\d+', commentsTag.text).group(0))
     if user!=None:
         print('\n',':',numComments,user,subreddit,title)
+        author = user
     else:
         print('\n' + ':', numComments, author, subreddit, title)
-    commentTree = {} if numComments == 0 else parseComments(url,user)
+    commentTree = {} if numComments == 0 else parseComments(url)
     results.append({'title':title, 'author':author, 'subreddit':subreddit, 'comments':commentTree})
 
 
