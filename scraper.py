@@ -52,13 +52,12 @@ def parsePost(post, results, user):
     commentsTag = post.find('a', {'class':'search-comments'})
     url = commentsTag['href']
     numComments = int(re.match(r'\d+', commentsTag.text).group(0))
-    results.append({'title':title, 'author':author, 'subreddit':subreddit, 'comments':commentTree})
     if user!=None:
         print('\n',':',numComments,user,subreddit,title)
     else:
         print('\n' + ':', numComments, author, subreddit, title)
-        commentTree = {} if numComments == 0 else parseComments(url,user)
-        results.append({'title':title, 'author':author, 'subreddit':subreddit, 'comments':commentTree})
+    commentTree = {} if numComments == 0 else parseComments(url,user)
+    results.append({'title':title, 'author':author, 'subreddit':subreddit, 'comments':commentTree})
 
 
 def returnResults(searchUrl,keyword,subreddit,user):
