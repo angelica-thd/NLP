@@ -61,27 +61,35 @@ def sentence_similarity(sentence1, sentence2):
             if(pathsim != None):
                 if(best_score < pathsim):
                     best_score = pathsim
-        # Check that the similarity could have been computed 	
+        # Check that the similarity could have been computed
         if best_score is not None:
-            score += best_score
-            count += 1
+            if best_score > score:
+                score = best_score	
+        #if best_score is not None:
+            #score += best_score
+            #count += 1
  
     # Average the values
-    if(count != 0):
-        score /= count
+    #if(count != 0):
+        #score /= count
     return score
     
 
 def preprocess(text):
     title_list = []
     for t in text:
-        title_list.append(t['title'])
-        #print(t['title'])
+        title = t['title']
+        title = title.split('.')
+        for ti in title:
+            title_list.append(ti)
     return title_list
 
 
 def compute_score(text, words):
     score = 0
+    if(len(text) == 0):
+        return 0
+    #print(text[1])
     for t in text:
         for w in words:
             score += sentence_similarity(t, w)
@@ -149,27 +157,4 @@ n_agreeableness   = ['unfriendly', 'harsh', 'unpleasant', 'hard']
 
 neuroticism       = ['sensitive', 'nervous', 'obsessive', 'hysteric', 'anxious', 'nervous', 'unstable']
 n_neuroticism     = ['adjusted', 'balanced', 'stable']
-
-
-    
-'''sentences = [
-    "I like to study.",
-    "I am very open and like to go out.",
-    "I think I am very nice.",
-    "I am very stressed out.",
-]
- 
-openness = "open"
-conscientiousness = "study"
-extraversion = "outgoing"
-agreeableness = "nice"
-neuroticism = "neurotic"
- 
-for sentence in sentences:
-    print("Similarity(\"%s\", \"%s\") = %s" % (openness, sentence, sentence_similarity(openness, sentence)))
-    print("Similarity(\"%s\", \"%s\") = %s" % (conscientiousness, sentence, sentence_similarity(conscientiousness, sentence)))
-    print("Similarity(\"%s\", \"%s\") = %s" % (extraversion, sentence, sentence_similarity(extraversion, sentence)))
-    print("Similarity(\"%s\", \"%s\") = %s" % (agreeableness, sentence, sentence_similarity(agreeableness, sentence)))
-    print("Similarity(\"%s\", \"%s\") = %s" % (neuroticism, sentence, sentence_similarity(neuroticism, sentence)))
-    print("\n")'''
 
