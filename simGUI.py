@@ -1,6 +1,6 @@
 from tkinter import *
 from multiprocessing import Process, Manager
-import tkMessageBox
+#import tkMessageBox
 import scraper
 import os
 import wordnet_sim as ws
@@ -30,7 +30,7 @@ e2 = Entry(simple, font=("Ubuntu",15),textvariable=keyword,bg="#FFFFFF",highligh
 l4 = Label(simple,text = "Username: ",font=("Ubuntu",20),bg="#FFFFFF",highlightbackground="#ba4a00")
 e3 = Entry(simple, font=("Ubuntu",15),textvariable=user,bg="#FFFFFF",highlightbackground="#ba4a00")
 
-def createWindow():
+def createWindow(score_list):
 	window = Toplevel(simple)
 	window.geometry("1000x700")
 	window.configure(bg="#FFFFFF")
@@ -63,8 +63,8 @@ def submitKey():
 	username = None
 	if len(keyword.get()) == 0:
 		#for python3
-		#tkmessagebox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")		
-		tkMessageBox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
+		tkmessagebox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")		
+		#tkMessageBox.showerror("WARNING","No keyword detected:\nPlease enter a keyword if you want to get results.")
 	else:
 		keyword.set(keyword.get().replace(' ','-'))
 		key = keyword.get()
@@ -85,8 +85,9 @@ def submitKey():
 		
 def submitUser():
 	if len(subreddit.get()) == 0:
-		
-		tkMessageBox.showerror("WARNING","No reddit Forum detected:\nPlease enter a reddit forum(subject) if you want to get results.")
+		#for python3
+		tkmessagebox.showerror("WARNING","No reddit Forum detected:\nPlease enter a reddit forum(subject) if you want to get results.")
+		#tkMessageBox.showerror("WARNING","No reddit Forum detected:\nPlease enter a reddit forum(subject) if you want to get results.")
 	else:
 		subreddit.set(subreddit.get().replace(' ','-'))
 		sub = None
